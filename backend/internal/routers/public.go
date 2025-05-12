@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
+	"github.com/sdkim96/mcp-marketplace/internal/db"
 	"github.com/sdkim96/mcp-marketplace/internal/middleware"
 	"github.com/sdkim96/mcp-marketplace/internal/models"
 )
@@ -49,6 +51,58 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse[any]{
 		Success: true,
 		Data:    models.LoginRespBody{Token: token},
+		Error:   nil,
+	})
+
+}
+
+func Signup(c *gin.Context) {
+
+	var (
+		signupRequest *models.SignupRequest
+		h             *gorm.DB
+	)
+
+	signupRequest = models.NewSignupRequest()
+	h = db.GetDBHandler()
+	err := c.ShouldBindJSON(signupRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse[any]{
+			Success: false,
+			Data:    nil,
+			Error:   "Request body is not valid",
+		})
+		return
+	}
+	exist, err := db.GetUserByEmail(h, signupRequest.Email)
+	if exist != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse[any]{
+			Success: false,
+			Data:    nil,
+			Error:   "User already exists",
+		})
+		return
+	}
+	if err != nil && err.Error() != "record not found" {
+		c.JSON(http.StatusInternalServerError, models.APIResponse[any]{
+			Success: false,
+			Data:    nil,
+			Error:   "Failed to check user",
+		})
+		return
+	}
+	err = db.AddUser(h, signupRequest)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse[any]{
+			Success: false,
+			Data:    nil,
+			Error:   "Failed to add user",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, models.APIResponse[any]{
+		Success: true,
+		Data:    nil,
 		Error:   nil,
 	})
 

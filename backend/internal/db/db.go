@@ -19,10 +19,12 @@ func InitDB() {
 	h.AutoMigrate(&UserTable{})
 
 	admin := &UserTable{
-		ID:       "123",
+		ID:       "admin",
 		UserName: "admin",
-		Email:    "admin@sdkim.com",
+		Email:    "sdkim96@gmail.com",
+		Password: "admin",
 	}
+
 	err := h.Save(admin).Error
 	if err != nil {
 		panic("failed to add user")

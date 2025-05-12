@@ -15,7 +15,15 @@ type LoginRespBody struct {
 }
 
 func NewLoginRequest() *LoginRequest {
-
 	return &LoginRequest{}
+}
 
+type SignupRequest struct {
+	UserName string `json:"username" xml:"username"  binding:"required"`
+	Password string `json:"password" xml:"password" binding:"required"`
+	Email    string `json:"email" xml:"email" binding:"required"`
+}
+
+func NewSignupRequest() *SignupRequest {
+	return &SignupRequest{}
 }

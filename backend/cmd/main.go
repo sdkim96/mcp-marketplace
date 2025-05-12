@@ -30,6 +30,7 @@ func GroupRouter(r *gin.Engine, c *config.AppConfig) error {
 	public := r.Group("/api/v1")
 	public.GET("/health", routers.HealthCheck)
 	public.POST("/login", routers.Login)
+	public.POST("/sign-up", routers.Signup)
 
 	me := r.Group("/api/v1/me")
 	me.Use(middleware.AuthMiddleware())
